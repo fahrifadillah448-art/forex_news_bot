@@ -1,22 +1,9 @@
 import requests
 
-TOPIC = "forex_pai_2026"
-
-message = """
-🤖 Forex Intelligence Bot
-
-✅ Python berhasil dijalankan
-✅ GitHub Actions berhasil
-✅ Siap untuk mengambil data ekonomi
-"""
-
-requests.post(
-    f"https://ntfy.sh/{TOPIC}",
-    data=message.encode("utf-8"),
-    headers={
-        "Title": "Forex Intelligence",
-        "Priority": "default"
-    }
+response = requests.post(
+    "https://ntfy.sh/forex_pai_2026",
+    data="TEST DARI GITHUB ACTIONS"
 )
 
-print("Notification sent!")
+print(response.status_code)
+print(response.text)
