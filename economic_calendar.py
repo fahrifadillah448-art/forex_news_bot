@@ -14,10 +14,11 @@ def get_events():
 
     response = requests.get(url, timeout=20)
 
-print(response.status_code)
-print(response.text)
+    print(response.status_code)
+    print(response.text)
 
-     data = response.json()
+    data = response.json()
+
     events = []
 
     for item in data:
