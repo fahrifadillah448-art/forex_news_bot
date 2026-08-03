@@ -17,7 +17,7 @@ def get_events():
 print(response.status_code)
 print(response.text)
 
-data = response.json()
+     data = response.json()
     events = []
 
     for item in data:
