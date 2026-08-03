@@ -1,0 +1,15 @@
+name: Forex News Bot
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Notification
+        run: |
+          curl -d "📈 Forex News Bot masih aktif - $(date)" https://ntfy.sh/forex_pai_2026
