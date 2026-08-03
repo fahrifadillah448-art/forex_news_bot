@@ -1,22 +1,19 @@
 from notify import send_notification
+from calendar import get_events
 
-title = "Forex Intelligence Bot"
+events = get_events()
 
-message = """
-🚨 HIGH IMPACT TEST
+message = "📅 Forex Intelligence Bot\n\n"
 
-🇺🇸 US CPI
+for event in events:
+    message += (
+        f"{event['country']} {event['title']}\n"
+        f"🕒 {event['time']}\n"
+        f"Impact : {event['impact']}\n"
+        f"Forecast : {event['forecast']}\n"
+        f"Previous : {event['previous']}\n\n"
+    )
 
-🕗 20:30 WIB
+send_notification("Agenda Ekonomi", message)
 
-Forecast : 2.8%
-Previous : 2.7%
-
-━━━━━━━━━━━━━━
-
-Bot berhasil mengirim format profesional.
-"""
-
-send_notification(title, message)
-
-print("Done")
+print("Economic Calendar Sent!")
