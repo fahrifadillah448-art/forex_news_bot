@@ -17,7 +17,12 @@ def get_events():
     print(response.status_code)
     print(response.text)
 
-    data = response.json()
+    if response.status_code != 200:
+    print(f"HTTP Error: {response.status_code}")
+    print(response.text)
+    return []
+
+data = response.json()
 
     events = []
 
