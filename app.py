@@ -1,9 +1,22 @@
-import requests
+from notify import send_notification
 
-response = requests.post(
-    "https://ntfy.sh/forex_pai_2026",
-    data="TEST DARI GITHUB ACTIONS"
-)
+title = "Forex Intelligence Bot"
 
-print(response.status_code)
-print(response.text)
+message = """
+🚨 HIGH IMPACT TEST
+
+🇺🇸 US CPI
+
+🕗 20:30 WIB
+
+Forecast : 2.8%
+Previous : 2.7%
+
+━━━━━━━━━━━━━━
+
+Bot berhasil mengirim format profesional.
+"""
+
+send_notification(title, message)
+
+print("Done")
