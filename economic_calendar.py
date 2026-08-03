@@ -1,19 +1,31 @@
+import requests
+import os
+from datetime import datetime
+
+API_KEY = os.getenv("FMP_API_KEY")
+
 def get_events():
-    return [
-        {
-            "country": "🇺🇸",
-            "title": "Initial Jobless Claims",
-            "time": "19:30 WIB",
-            "forecast": "236K",
-            "previous": "233K",
-            "impact": "🔥🔥🔥"
-        },
-        {
-            "country": "🇺🇸",
-            "title": "Core PCE",
-            "time": "20:30 WIB",
-            "forecast": "2.8%",
-            "previous": "2.7%",
-            "impact": "🔥🔥🔥"
-        }
-    ]
+    today = datetime.utcnow().strftime("%Y-%m-%d")
+
+    url = (
+        f"https://financialmodelingprep.com/stable/economic-calendar"
+        f"?from={today}&to={today}&apikey={API_KEY}"
+    )
+
+    response = requests.get(url, timeout=20)
+    data = response.json()
+
+    events = []
+
+    for item in data:
+        if item.get("country") == "US":
+            events.append({
+                "country": "🇺🇸",
+                "title": item.get("event", "Unknown"),
+                "time": item.get("date", ""),
+                "forecast": item.get("estimate", "-"),
+                "previous": item.get("previous", "-"),
+                "impact": "🔥"
+            })
+
+    return events
