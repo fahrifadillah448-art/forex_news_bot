@@ -1,7 +1,8 @@
 from notify import send_notification
-from economic_calendar import get_events
+from economic_calendar import EconomicCalendar
 
-events = get_events()
+calendar = EconomicCalendar()
+events = calendar.get_events()
 
 if not events:
     send_notification(
