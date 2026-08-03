@@ -1,5 +1,5 @@
 from notify import send_notification
-from calendar import get_events
+from economic_calendar import get_events
 
 events = get_events()
 
