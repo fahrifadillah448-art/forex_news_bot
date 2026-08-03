@@ -3,6 +3,14 @@ from economic_calendar import get_events
 
 events = get_events()
 
+if not events:
+    send_notification(
+        "Forex Intelligence",
+        "Hari ini tidak ada event ekonomi USD."
+    )
+    print("No events found")
+    exit()
+
 message = "📅 Forex Intelligence Bot\n\n"
 
 for event in events:
