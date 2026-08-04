@@ -61,13 +61,13 @@ class EconomicCalendar(EconomicProvider):
                 impact = "-"
 
             events.append({
-                "country": f"🇺🇸 {item.get('currency', 'USD')}",
-                "title": item.get("event", "Unknown Event"),
-                "time": formatted_time,
-                "forecast": item.get("forecast") or "-",
-                "previous": item.get("previous") or "-",
-                "actual": item.get("actual") or "-",
-                "impact": impact
-            })
-
+    "id": f"{item.get('currency')}_{item.get('event')}_{item.get('datetime')}",
+    "country": f"🇺🇸 {item.get('currency', 'USD')}",
+    "title": item.get("event", "Unknown Event"),
+    "time": formatted_time,
+    "forecast": item.get("forecast") or "-",
+    "previous": item.get("previous") or "-",
+    "actual": item.get("actual") or "-",
+    "impact": impact
+})
         return events
