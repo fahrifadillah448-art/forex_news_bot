@@ -8,20 +8,24 @@ if not events:
     print("No events found")
     exit()
 
-message = "📅 Forex Intelligence\n\n"
+message = "📊 FOREX INTELLIGENCE\n"
+message += "━━━━━━━━━━━━━━━━━━\n\n"
 
 for event in events:
 
     message += (
-        f"{event['country']} {event['title']}\n"
+        f"{event['country']}\n"
+        f"📌 {event['title']}\n"
         f"🕒 {event['time']}\n"
-        f"🔥 Impact : {event['impact']}\n"
-        f"📊 Forecast : {event['forecast']}\n"
-        f"📉 Previous : {event['previous']}\n\n"
+        f"{event['impact']}\n\n"
+        f"📈 Forecast : {event['forecast']}\n"
+        f"📉 Previous : {event['previous']}\n"
+        f"✅ Actual   : {event['actual']}\n"
+        f"\n━━━━━━━━━━━━━━━━━━\n\n"
     )
 
 send_notification(
-    "High Impact Events",
+    "📊 Forex Intelligence",
     message
 )
 
