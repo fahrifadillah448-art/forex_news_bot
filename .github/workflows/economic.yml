@@ -8,14 +8,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - run: pip install -r requirements.txt
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
 
-      - run: python app.py
+      - name: Run Bot
+        run: python app.py
         env:
-          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+          TICKATLAS_API_KEY: ${{ secrets.TICKATLAS_API_KEY }}
