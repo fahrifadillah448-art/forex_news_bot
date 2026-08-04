@@ -2,7 +2,7 @@ import requests
 from config import TOPIC
 
 def send_notification(title, message):
-    requests.post(
+    response = requests.post(
         f"https://ntfy.sh/{TOPIC}",
         data=message.encode("utf-8"),
         headers={
@@ -10,3 +10,6 @@ def send_notification(title, message):
             "Priority": "default"
         }
     )
+
+    print("Notify Status:", response.status_code)
+    print("Notify Response:", response.text)
