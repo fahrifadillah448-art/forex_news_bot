@@ -1,5 +1,11 @@
 from notify import send_notification
 from economic_calendar import EconomicCalendar
+from config import TICKATLAS_API_KEY
+
+print("API Key loaded:", TICKATLAS_API_KEY is not None)
+
+if TICKATLAS_API_KEY:
+    print("API Key prefix:", TICKATLAS_API_KEY[:6])
 
 calendar = EconomicCalendar()
 events = calendar.get_events()
