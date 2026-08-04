@@ -28,6 +28,8 @@ class EconomicCalendar(EconomicProvider):
 
         data = response.json()
 
+        print("Total events:", data["data"]["count"])
+
         events = []
 
         for item in data["data"]["events"]:
