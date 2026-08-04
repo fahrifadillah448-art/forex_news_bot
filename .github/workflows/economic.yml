@@ -16,6 +16,6 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      - run: python test_scraper.py
+      - run: python app.py
         env:
           FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
