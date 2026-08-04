@@ -15,7 +15,7 @@ class EconomicCalendar(EconomicProvider):
             params={
                 "currencies": "USD",
                 "impact": "high",
-                "next_hours": 24
+                "next_hours": 168
             },
             timeout=20
         )
