@@ -1,6 +1,5 @@
 import requests
-
-TOPIC = "forex_pai_2026"
+from config import TOPIC
 
 def send_notification(title, message):
     requests.post(
