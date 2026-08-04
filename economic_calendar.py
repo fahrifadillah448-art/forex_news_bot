@@ -21,7 +21,23 @@ class EconomicCalendar(EconomicProvider):
         )
 
         print("Status:", response.status_code)
-        print("Response text:")
-        print(response.text)
 
-        return []
+        if response.status_code != 200:
+            print(response.text)
+            return []
+
+        data = response.json()
+
+        events = []
+
+        for item in data["data"]["events"]:
+            events.append({
+                "country": "🇺🇸",
+                "title": item.get("event", "Unknown"),
+                "time": item.get("datetime", "--"),
+                "forecast": item.get("forecast", "-"),
+                "previous": item.get("previous", "-"),
+                "impact": item.get("impact", "-")
+            })
+
+        return events
