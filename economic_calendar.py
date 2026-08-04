@@ -1,4 +1,7 @@
 import requests
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 from config import TICKATLAS_API_KEY
 from provider import EconomicProvider
 
@@ -33,13 +36,38 @@ class EconomicCalendar(EconomicProvider):
         events = []
 
         for item in data["data"]["events"]:
+
+            # UTC -> WIB
+            utc_time = datetime.fromisoformat(
+                item["datetime"].replace("Z", "+00:00")
+            )
+
+            wib_time = utc_time.astimezone(
+                ZoneInfo("Asia/Jakarta")
+            )
+
+            formatted_time = wib_time.strftime("%d %B %Y | %H:%M WIB")
+
+            # Impact
+            impact = item.get("impact", "").lower()
+
+            if impact == "high":
+                impact = "🔥🔥🔥 High"
+            elif impact == "medium":
+                impact = "🔥🔥 Medium"
+            elif impact == "low":
+                impact = "🔥 Low"
+            else:
+                impact = "-"
+
             events.append({
-                "country": "🇺🇸",
-                "title": item.get("event", "Unknown"),
-                "time": item.get("datetime", "--"),
-                "forecast": item.get("forecast", "-"),
-                "previous": item.get("previous", "-"),
-                "impact": item.get("impact", "-")
+                "country": f"🇺🇸 {item.get('currency', 'USD')}",
+                "title": item.get("event", "Unknown Event"),
+                "time": formatted_time,
+                "forecast": item.get("forecast") or "-",
+                "previous": item.get("previous") or "-",
+                "actual": item.get("actual") or "-",
+                "impact": impact
             })
 
         return events
