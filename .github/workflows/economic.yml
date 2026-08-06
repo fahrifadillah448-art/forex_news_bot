@@ -3,9 +3,6 @@ name: Forex Intelligence Bot
 on:
   workflow_dispatch:
 
-  schedule:
-    - cron: "0 * * * *"
-
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -22,9 +19,9 @@ jobs:
       - name: Install Dependencies
         run: pip install -r requirements.txt
 
-      - name: Test Supabase
-  run: python test_supabase.py
-  
-  TICKATLAS_API_KEY: ${{ secrets.TICKATLAS_API_KEY }}
-  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-  SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      - name: Test Supabase Connection
+        run: python test_supabase.py
+        env:
+          TICKATLAS_API_KEY: ${{ secrets.TICKATLAS_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
