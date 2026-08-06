@@ -1,3 +1,4 @@
+import hashlib
 import requests
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -47,11 +48,8 @@ class EconomicCalendar(EconomicProvider):
                 utc_time - now
             ).total_seconds() / 60
 
-            # hanya kirim jika 20-30 menit sebelum berita
-            if minutes_left > 30:
-                continue
-
-            if minutes_left < 20:
+            # hanya kirim 20-30 menit sebelum berita
+            if not (20 <= minutes_left <= 30):
                 continue
 
             wib_time = utc_time.astimezone(
@@ -71,9 +69,14 @@ class EconomicCalendar(EconomicProvider):
             else:
                 impact = "🔥 Low Impact"
 
+            # ID unik berdasarkan event + waktu
+            raw_id = f"{item.get('event','')}_{item.get('datetime','')}"
+            event_id = hashlib.md5(raw_id.encode()).hexdigest()
+
             events.append({
+                "event_id": event_id,
                 "country": f"🇺🇸 {item.get('currency','USD')}",
-                "title": item.get("event","Unknown Event"),
+                "title": item.get("event", "Unknown Event"),
                 "time": formatted_time,
                 "forecast": item.get("forecast") or "-",
                 "previous": item.get("previous") or "-",
