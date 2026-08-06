@@ -11,17 +11,15 @@ if not events:
 
 message = "📅 Forex Intelligence\n\n"
 
-new_event = False
+new_events = []
 
 for event in events:
 
     if event_exists(event["event_id"]):
-        print(f"Skip : {event['title']}")
+        print(f"Skip: {event['title']}")
         continue
 
-    save_event(event)
-
-    new_event = True
+    new_events.append(event)
 
     message += (
         f"{event['country']} {event['title']}\n"
@@ -31,8 +29,13 @@ for event in events:
         f"📉 Previous : {event['previous']}\n\n"
     )
 
-if new_event:
-    send_notification("High Impact Events", message)
-    print("Notification Sent")
-else:
+if not new_events:
     print("No new events")
+    exit()
+
+send_notification("High Impact Events", message)
+
+for event in new_events:
+    save_event(event)
+
+print(f"Notification sent ({len(new_events)} new events)")
