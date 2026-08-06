@@ -1,6 +1,6 @@
 from notify import send_notification
 from economic_calendar import EconomicCalendar
-from sent_events import already_sent, mark_sent
+from database.supabase_client import event_exists, save_event
 
 calendar = EconomicCalendar()
 events = calendar.get_events()
@@ -9,41 +9,30 @@ if not events:
     print("No events found")
     exit()
 
-new_events = []
+message = "📅 Forex Intelligence\n\n"
+
+new_event = False
 
 for event in events:
 
-    if already_sent(event["id"]):
-        print(f"Skip: {event['title']}")
+    if event_exists(event["event_id"]):
+        print(f"Skip : {event['title']}")
         continue
 
-    new_events.append(event)
-    mark_sent(event["id"])
+    save_event(event)
 
-if not new_events:
-    print("No new events")
-    exit()
-
-message = "📊 FOREX INTELLIGENCE\n"
-message += "━━━━━━━━━━━━━━━━━━\n\n"
-
-for event in new_events:
+    new_event = True
 
     message += (
-        f"{event['country']}\n"
-        f"📌 {event['title']}\n"
+        f"{event['country']} {event['title']}\n"
         f"🕒 {event['time']}\n"
-        f"{event['impact']}\n\n"
-        f"📈 Forecast : {event['forecast']}\n"
-        f"📉 Previous : {event['previous']}\n"
-        f"✅ Actual   : {event['actual']}\n"
-        f"\n━━━━━━━━━━━━━━━━━━\n\n"
+        f"🔥 Impact : {event['impact']}\n"
+        f"📊 Forecast : {event['forecast']}\n"
+        f"📉 Previous : {event['previous']}\n\n"
     )
 
-send_notification(
-    "📊 Forex Intelligence",
-    message
-)
-
-print(message)
-print("Economic Calendar Sent!")
+if new_event:
+    send_notification("High Impact Events", message)
+    print("Notification Sent")
+else:
+    print("No new events")
