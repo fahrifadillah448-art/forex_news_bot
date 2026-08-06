@@ -20,7 +20,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Test Supabase Connection
-        run: python test_supabase.py
+        run: python test_logger.py
         env:
           TICKATLAS_API_KEY: ${{ secrets.TICKATLAS_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
