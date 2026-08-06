@@ -22,9 +22,9 @@ jobs:
       - name: Install Dependencies
         run: pip install -r requirements.txt
 
-      - name: Run Bot
-        run: python app.py
-        env:
+      - name: Test Supabase
+  run: python test_supabase.py
+  
   TICKATLAS_API_KEY: ${{ secrets.TICKATLAS_API_KEY }}
   SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
   SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
