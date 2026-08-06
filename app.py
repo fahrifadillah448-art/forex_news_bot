@@ -1,41 +1,59 @@
 from notify import send_notification
 from economic_calendar import EconomicCalendar
 from database.supabase_client import event_exists, save_event
+from database.logger import log_info, log_error
 
-calendar = EconomicCalendar()
-events = calendar.get_events()
+try:
 
-if not events:
-    print("No events found")
-    exit()
+    log_info("Bot started")
 
-message = "📅 Forex Intelligence\n\n"
+    calendar = EconomicCalendar()
+    events = calendar.get_events()
 
-new_events = []
+    log_info(f"Found {len(events)} events")
 
-for event in events:
+    if not events:
+        log_info("No events found")
+        exit()
 
-    if event_exists(event["event_id"]):
-        print(f"Skip: {event['title']}")
-        continue
+    message = "📅 Forex Intelligence\n\n"
 
-    new_events.append(event)
+    new_events = []
 
-    message += (
-        f"{event['country']} {event['title']}\n"
-        f"🕒 {event['time']}\n"
-        f"🔥 Impact : {event['impact']}\n"
-        f"📊 Forecast : {event['forecast']}\n"
-        f"📉 Previous : {event['previous']}\n\n"
-    )
+    for event in events:
 
-if not new_events:
-    print("No new events")
-    exit()
+        if event_exists(event["event_id"]):
+            log_info(f"Skip: {event['title']}")
+            continue
 
-send_notification("High Impact Events", message)
+        new_events.append(event)
 
-for event in new_events:
-    save_event(event)
+        message += (
+            f"{event['country']} {event['title']}\n"
+            f"🕒 {event['time']}\n"
+            f"🔥 Impact : {event['impact']}\n"
+            f"📊 Forecast : {event['forecast']}\n"
+            f"📉 Previous : {event['previous']}\n\n"
+        )
 
-print(f"Notification sent ({len(new_events)} new events)")
+    if not new_events:
+        log_info("No new events")
+        print("No new events")
+        exit()
+
+    send_notification("High Impact Events", message)
+
+    log_info("Notification sent")
+
+    for event in new_events:
+        save_event(event)
+
+    log_info(f"Saved {len(new_events)} events")
+
+    print("Done")
+
+except Exception as e:
+
+    log_error(str(e))
+
+    raise
