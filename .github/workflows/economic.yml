@@ -1,16 +1,20 @@
 name: Forex Intelligence Bot
 
 on:
+  push:
+    branches:
+      - main
+
   workflow_dispatch:
 
   schedule:
-  - cron: "*/5 * * * *"
+    - cron: "*/5 * * * *"
+
 jobs:
   run:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
