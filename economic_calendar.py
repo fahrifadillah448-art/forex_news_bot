@@ -1,118 +1,155 @@
 import requests
-from datetime import datetime
-from zoneinfo import ZoneInfo
-
+from datetime import datetime, timezone
 from config import TICKATLAS_API_KEY
-from provider import EconomicProvider
 
 
-class EconomicCalendar(EconomicProvider):
+class EconomicCalendar:
+
+    def __init__(self):
+        self.url = "https://tickatlas.com/v1/calendar"
 
     def get_events(self):
 
+        headers = {
+            "X-API-Key": TICKATLAS_API_KEY
+        }
+
+        params = {
+            "currencies": "USD",
+            "impact": "high",
+            "next_hours": 168
+        }
+
         response = requests.get(
-            "https://tickatlas.com/v1/calendar",
-            headers={
-                "X-API-Key": TICKATLAS_API_KEY
-            },
-            params={
-                "currencies": "USD",
-                "impact": "high",
-                "next_hours": 168
-            },
-            timeout=20
+            self.url,
+            headers=headers,
+            params=params,
+            timeout=30
         )
 
         print("Status:", response.status_code)
 
-        if response.status_code != 200:
-            print(response.text)
-            return []
+        response.raise_for_status()
 
         data = response.json()
 
-        print("Total events:", data["data"]["count"])
+        # Ambil list event
+        if isinstance(data, dict):
+            events_data = data.get("data", [])
+        else:
+            events_data = data
+
+        print("Total events:", len(events_data))
 
         events = []
 
-        now = datetime.now(ZoneInfo("UTC"))
+        now = datetime.now(timezone.utc)
 
-        for item in data["data"]["events"]:
+        for item in events_data:
 
-            utc_time = datetime.fromisoformat(
-                item["datetime"].replace("Z", "+00:00")
+            title = (
+                item.get("title")
+                or item.get("event")
+                or item.get("name")
+                or "Unknown Event"
             )
 
+            event_time_raw = (
+                item.get("event_time")
+                or item.get("datetime")
+                or item.get("date")
+                or item.get("time")
+            )
+
+            if not event_time_raw:
+                print("SKIP:", title, "| Tidak ada waktu")
+                continue
+
+            try:
+
+                event_time = datetime.fromisoformat(
+                    event_time_raw.replace("Z", "+00:00")
+                )
+
+                if event_time.tzinfo is None:
+                    event_time = event_time.replace(
+                        tzinfo=timezone.utc
+                    )
+
+                event_time = event_time.astimezone(timezone.utc)
+
+            except Exception as e:
+
+                print(
+                    "SKIP:",
+                    title,
+                    "| Format waktu error:",
+                    event_time_raw
+                )
+
+                continue
+
             minutes_left = (
-                utc_time - now
+                event_time - now
             ).total_seconds() / 60
 
             print(
-                "EVENT:",
-                item.get("event"),
-                "| UTC:",
-                utc_time,
-                "| Minutes left:",
-                round(minutes_left, 2)
+                f"EVENT: {title} | "
+                f"UTC: {event_time} | "
+                f"Minutes left: {minutes_left:.2f}"
             )
 
-            # Kirim event jika waktunya
-            # 0 sampai 60 menit dari sekarang
-            if minutes_left > 60:
-                continue
-
+            # Event yang sudah lewat
             if minutes_left < 0:
+                print("SKIP: Event sudah lewat")
                 continue
 
-            wib_time = utc_time.astimezone(
-                ZoneInfo("Asia/Jakarta")
+            # Hanya ambil event dalam 3 jam ke depan
+            if minutes_left > 180:
+                print("SKIP: Event masih terlalu jauh")
+                continue
+
+            event_id = (
+                str(item.get("event_id"))
+                if item.get("event_id")
+                else f"{title}_{event_time.isoformat()}"
             )
 
-            formatted_time = wib_time.strftime(
-                "%d %B %Y | %H:%M WIB"
+            country = (
+                item.get("country")
+                or item.get("currency")
+                or "USD"
             )
 
-            impact = item.get("impact", "").lower()
+            impact = (
+                item.get("impact")
+                or "high"
+            )
 
-            if impact == "high":
-                impact = "🔥🔥🔥 High Impact"
+            forecast = (
+                item.get("forecast")
+                if item.get("forecast") is not None
+                else "-"
+            )
 
-            elif impact == "medium":
-                impact = "🔥🔥 Medium Impact"
-
-            else:
-                impact = "🔥 Low Impact"
+            previous = (
+                item.get("previous")
+                if item.get("previous") is not None
+                else "-"
+            )
 
             events.append({
-                "event_id": (
-                    item.get("id")
-                    or item.get("event_id")
-                ),
-                "country": (
-                    f"🇺🇸 "
-                    f"{item.get('currency', 'USD')}"
-                ),
-                "title": item.get(
-                    "event",
-                    "Unknown Event"
-                ),
-                "time": formatted_time,
-                "forecast": (
-                    item.get("forecast")
-                    or "-"
-                ),
-                "previous": (
-                    item.get("previous")
-                    or "-"
-                ),
-                "actual": (
-                    item.get("actual")
-                    or "-"
+                "event_id": event_id,
+                "country": country,
+                "title": title,
+                "time": event_time.strftime(
+                    "%Y-%m-%d %H:%M UTC"
                 ),
                 "impact": impact,
-                "minutes_left": int(
-                    minutes_left
-                )
+                "forecast": forecast,
+                "previous": previous
             })
+
+        print("Selected events:", len(events))
 
         return events
