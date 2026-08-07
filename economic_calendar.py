@@ -47,7 +47,6 @@ class EconomicCalendar(EconomicProvider):
                 utc_time - now
             ).total_seconds() / 60
 
-            # DEBUG
             print(
                 "EVENT:",
                 item.get("event"),
@@ -57,11 +56,12 @@ class EconomicCalendar(EconomicProvider):
                 round(minutes_left, 2)
             )
 
-            # Hanya kirim jika 20-30 menit sebelum berita
-            if minutes_left > 30:
+            # Kirim event jika waktunya
+            # 0 sampai 60 menit dari sekarang
+            if minutes_left > 60:
                 continue
 
-            if minutes_left < 20:
+            if minutes_left < 0:
                 continue
 
             wib_time = utc_time.astimezone(
@@ -76,21 +76,43 @@ class EconomicCalendar(EconomicProvider):
 
             if impact == "high":
                 impact = "🔥🔥🔥 High Impact"
+
             elif impact == "medium":
                 impact = "🔥🔥 Medium Impact"
+
             else:
                 impact = "🔥 Low Impact"
 
             events.append({
-                "event_id": item.get("id") or item.get("event_id"),
-                "country": f"🇺🇸 {item.get('currency', 'USD')}",
-                "title": item.get("event", "Unknown Event"),
+                "event_id": (
+                    item.get("id")
+                    or item.get("event_id")
+                ),
+                "country": (
+                    f"🇺🇸 "
+                    f"{item.get('currency', 'USD')}"
+                ),
+                "title": item.get(
+                    "event",
+                    "Unknown Event"
+                ),
                 "time": formatted_time,
-                "forecast": item.get("forecast") or "-",
-                "previous": item.get("previous") or "-",
-                "actual": item.get("actual") or "-",
+                "forecast": (
+                    item.get("forecast")
+                    or "-"
+                ),
+                "previous": (
+                    item.get("previous")
+                    or "-"
+                ),
+                "actual": (
+                    item.get("actual")
+                    or "-"
+                ),
                 "impact": impact,
-                "minutes_left": int(minutes_left)
+                "minutes_left": int(
+                    minutes_left
+                )
             })
 
         return events
