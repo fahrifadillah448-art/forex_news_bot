@@ -20,8 +20,8 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Test Logger Insert
-  run: python test_logger_insert.py
-  env:
-    TICKATLAS_API_KEY: ${{ secrets.TICKATLAS_API_KEY }}
-    SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-    SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: python test_logger_insert.py
+        env:
+          TICKATLAS_API_KEY: ${{ secrets.TICKATLAS_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
