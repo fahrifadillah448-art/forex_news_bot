@@ -19,9 +19,10 @@ jobs:
       - name: Install Dependencies
         run: pip install -r requirements.txt
 
-      - name: Test Logger Insert
-        run: python test_logger_insert.py
+      - name: Run Forex Intelligence Bot
+        run: python app.py
         env:
           TICKATLAS_API_KEY: ${{ secrets.TICKATLAS_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+  
