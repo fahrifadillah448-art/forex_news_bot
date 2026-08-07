@@ -17,7 +17,8 @@ class EconomicCalendar:
         params = {
             "currencies": "USD",
             "impact": "high",
-            "next_hours": 168
+            "next_hours": 168,
+            "limit": 100
         }
 
         response = requests.get(
@@ -35,12 +36,8 @@ class EconomicCalendar:
 
         print("API response type:", type(data))
 
-        if not isinstance(data, dict):
-            print("ERROR: response API bukan dictionary")
-            print(data)
-            return []
-
-        # Ambil data utama
+        # TickAtlas menggunakan:
+        # data -> events
         api_data = data.get("data", {})
 
         if not isinstance(api_data, dict):
@@ -48,7 +45,6 @@ class EconomicCalendar:
             print(api_data)
             return []
 
-        # Ambil events
         events = api_data.get("events", [])
 
         if not isinstance(events, list):
@@ -64,29 +60,20 @@ class EconomicCalendar:
 
         for item in events:
 
-            # Pastikan item berbentuk dictionary
             if not isinstance(item, dict):
                 print("SKIP item invalid:", item)
                 continue
 
-            title = item.get("title")
+            # FIELD YANG BENAR DARI TICKATLAS
+            title = item.get("event")
 
             if not title:
-                print("SKIP event tanpa title")
+                print("SKIP event tanpa nama")
                 continue
 
             raw_time = item.get("datetime")
 
-            if raw_time is None:
-                raw_time = item.get("date")
-
-            if raw_time is None:
-                raw_time = item.get("time")
-
-            if raw_time is None:
-                raw_time = item.get("event_time")
-
-            if raw_time is None:
+            if not raw_time:
                 print("SKIP event tanpa waktu:", title)
                 continue
 
@@ -129,7 +116,8 @@ class EconomicCalendar:
                 round(minutes_left, 2)
             )
 
-            # Hanya event 0-60 menit dari sekarang
+            # Kita ambil event yang akan terjadi
+            # dalam 60 menit ke depan.
             if minutes_left < 0:
                 continue
 
@@ -138,28 +126,16 @@ class EconomicCalendar:
 
             event_id = item.get("id")
 
-            if event_id is None:
-                event_id = item.get("event_id")
-
-            if event_id is None:
+            if not event_id:
                 event_id = (
                     title
                     + "_"
                     + event_time.isoformat()
                 )
 
-            country = item.get("country")
+            currency = item.get("currency", "USD")
 
-            if country is None:
-                country = item.get("currency")
-
-            if country is None:
-                country = "USD"
-
-            impact = item.get("impact")
-
-            if impact is None:
-                impact = "High"
+            impact = item.get("impact", "high")
 
             forecast = item.get("forecast")
 
@@ -176,17 +152,18 @@ class EconomicCalendar:
             if actual is None:
                 actual = "-"
 
-            jakarta = timezone(
+            # UTC -> WIB
+            jakarta_timezone = timezone(
                 timedelta(hours=7)
             )
 
             jakarta_time = event_time.astimezone(
-                jakarta
+                jakarta_timezone
             )
 
             results.append({
                 "event_id": str(event_id),
-                "country": str(country),
+                "country": str(currency),
                 "title": str(title),
                 "time": jakarta_time.strftime(
                     "%Y-%m-%d %H:%M WIB"
