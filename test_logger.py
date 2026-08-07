@@ -1,5 +1,6 @@
-from database.logger import log_info
+from database.supabase_client import supabase
 
-log_info("Logger test berhasil")
+response = supabase.table("bot_logs").select("*").limit(1).execute()
 
-print("Logger OK")
+print("SUPABASE TEST")
+print(response.data)
