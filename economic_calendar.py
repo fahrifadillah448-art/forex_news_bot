@@ -36,8 +36,6 @@ class EconomicCalendar:
 
         print("API response type:", type(data))
 
-        # TickAtlas menggunakan:
-        # data -> events
         api_data = data.get("data", {})
 
         if not isinstance(api_data, dict):
@@ -64,7 +62,6 @@ class EconomicCalendar:
                 print("SKIP item invalid:", item)
                 continue
 
-            # FIELD YANG BENAR DARI TICKATLAS
             title = item.get("event")
 
             if not title:
@@ -116,12 +113,9 @@ class EconomicCalendar:
                 round(minutes_left, 2)
             )
 
-            # Kita ambil event yang akan terjadi
-            # dalam 60 menit ke depan.
+            # Jangan buang event yang masih akan datang.
+            # API sudah membatasi sampai 168 jam ke depan.
             if minutes_left < 0:
-                continue
-
-            if minutes_left > 60:
                 continue
 
             event_id = item.get("id")
@@ -133,26 +127,31 @@ class EconomicCalendar:
                     + event_time.isoformat()
                 )
 
-            currency = item.get("currency", "USD")
+            currency = item.get(
+                "currency",
+                "USD"
+            )
 
-            impact = item.get("impact", "high")
+            impact = item.get(
+                "impact",
+                "high"
+            )
 
-            forecast = item.get("forecast")
+            forecast = item.get(
+                "forecast",
+                "-"
+            )
 
-            if forecast is None:
-                forecast = "-"
+            previous = item.get(
+                "previous",
+                "-"
+            )
 
-            previous = item.get("previous")
+            actual = item.get(
+                "actual",
+                "-"
+            )
 
-            if previous is None:
-                previous = "-"
-
-            actual = item.get("actual")
-
-            if actual is None:
-                actual = "-"
-
-            # UTC -> WIB
             jakarta_timezone = timezone(
                 timedelta(hours=7)
             )
